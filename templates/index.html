@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>EID Tool Web</title>
+</head>
+
+<div class="card bg-light">
+    <article class="card-body mx-auto" style="max-width: 400px;">
+        <h4 class="card-title mt-3 text-center">Upload Master Matrix</h4>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group input-group">
+                <input name="file" class="form-control" placeholder="Master Matrix" type="file" required>
+            </div> <!-- form-group// -->
+            <div class="form-group text-center">
+                {% if file_name %}
+                <small class="text-primary">{{ file_name }} uploaded.</small>
+                {% else %}
+                {% if error %}
+                <small class="text-danger">{{ error }}</small>
+                {% else %}
+                <small class="text-danger">No file uploaded.</small>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="form-group pt-2 text-center">
+                <button type="submit" class="btn btn-primary btn-block col-lg-3" name="master-submit"> Upload </button>
+            </div> <!-- form-group// -->
+        </form>
+    </article>
+</div>
+{% if file_uploaded %}
+<div class="d-flex justify-content-center py-2">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="eid-tab" data-bs-toggle="tab" data-bs-target="#eid-content-tab" type="button"
+                role="tab" aria-controls="home" aria-selected="true">Search with EID</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="oid-tab" data-bs-toggle="tab" data-bs-target="#oid-content-tab" type="button"
+                role="tab" aria-controls="profile" aria-selected="false">Search with OID</button>
+        </li>
+    </ul>
+</div>
+<div class="d-flex justify-content-center">
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="eid-content-tab" role="tabpanel" aria-labelledby="eid-tab">
+            <form method="POST">
+                <div class="form-group input-group px-3 py-3">
+                    <input name="eid" class="form-control" placeholder="EID (ex. EAC31)" type="input" required>
+                </div> <!-- form-group// -->
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-block col-lg-6" name="eid-submit">Submit</button>
+                </div> <!-- form-group// -->
+            </form>
+        </div>
+        <div class="tab-pane fade" id="oid-content-tab" role="tabpanel" aria-labelledby="oid-tab">
+            <form method="POST">
+                <div class="form-group input-group px-3 py-2">
+                    <input name="oid" class="form-control" placeholder="Offer ID (ex. 1630941)" type="input" required>
+                </div> <!-- form-group// -->
+                <div class="form-group input-group px-3 py-2">
+                    <select name="env" class="form-select" aria-label="Default select example" required>
+                        <option value="0">QA INT</option>
+                        <option value="1">QA1</option>
+                        <option value="2">QA2</option>
+                        <option value="3">QA3</option>
+                    </select>
+                </div> <!-- form-group// -->
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary btn-block col-lg-6" name="button-submit">Submit</button>
+                </div> <!-- form-group// -->
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+</body>
+
+</html>
