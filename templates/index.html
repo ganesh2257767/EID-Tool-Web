@@ -13,54 +13,35 @@
 <body>
     <nav class="navbar navbar-dark bg-dark px-3 py-3">
         <div class="container-fluid">
-          <a class="navbar-brand" href="{{ url_for('index') }}">
-            <img src="{{ url_for('static', path='/main_icon.ico') }}" alt="" width="30" height="24" class="d-inline-block align-text-top">
-            EID Tool Web
-          </a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', path='/main_icon.ico') }}" alt="" width="30" height="24"
+                    class="d-inline-block align-text-top">
+                EID Tool Web
+            </a>
         </div>
-      </nav>
+    </nav>
     <div class="container">
         <div class="row">
-            <div class="col">
-                <h4 class="card-title mt-3 text-center">Upload Master Matrix</h4>
+            <h4 class="mt-3 text-center">Upload Master Matrix</h4>
+            <div class="d-flex justify-content-center">
                 <form method="POST" enctype="multipart/form-data">
                     <div class="input-group px-4 py-4">
                         <input name="master_file" type="file" class="form-control" required>
                         <button name="master-submit" class="btn btn-outline-primary" type="submit">Upload</button>
                     </div>
-                    <div class="form-group text-center">
-                        {% if master_file_uploaded %}
-                        <small class="text-primary">{{ master_file_name }} uploaded.</small>
-                        {% else %}
-                        {% if master_error %}
-                        <small class="text-danger">{{ master_error }}</small>
-                        {% else %}
-                        <small class="text-danger">No file uploaded.</small>
-                        {% endif %}
-                        {% endif %}
-                    </div>
-                </form>
             </div>
-            <div class="col">
-                <h4 class="card-title mt-3 text-center">Upload EID Sheet</h4>
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="input-group px-4 py-4">
-                        <input name="eid_file" type="file" class="form-control" required>
-                        <button name="eid-sheet-submit" class="btn btn-outline-primary" type="submit">Upload</button>
-                    </div>
-                    <div class="form-group text-center">
-                        {% if eid_file_uploaded %}
-                        <small class="text-primary">{{ eid_file_name }} uploaded.</small>
-                        {% else %}
-                        {% if eid_error %}
-                        <small class="text-danger">{{ eid_error }}</small>
-                        {% else %}
-                        <small class="text-danger">No file uploaded.</small>
-                        {% endif %}
-                        {% endif %}
-                    </div>
-                </form>
+            <div class="text-center">
+                {% if master_file_uploaded %}
+                <div class="alert alert-primary text-center" role="alert">{{ master_file_name }} uploaded.</div>
+                {% else %}
+                {% if master_error %}
+                <div class="alert alert-danger text-center" role="alert">{{ master_error }}</div>
+                {% else %}
+                <div class="alert alert-danger text-center" role="alert">No file uploaded.</div>
+                {% endif %}
+                {% endif %}
             </div>
+            </form>
         </div>
     </div>
     <hr>
@@ -68,18 +49,21 @@
     <div class="d-flex justify-content-center px-4 py-4">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="eid-tab" data-bs-toggle="tab" data-bs-target="#eid-content-tab"
-                    type="button" role="tab" aria-controls="home" aria-selected="true">Search with EID</button>
+                <button class="nav-link {{ eid_tab }}" id="eid-tab" data-bs-toggle="tab"
+                    data-bs-target="#eid-content-tab" type="button" role="tab" aria-controls="home"
+                    aria-selected="true">Search with EID</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="oid-tab" data-bs-toggle="tab" data-bs-target="#oid-content-tab"
-                    type="button" role="tab" aria-controls="profile" aria-selected="false">Search with Offer ID</button>
+                <button class="nav-link {{ oid_tab }}" id="oid-tab" data-bs-toggle="tab"
+                    data-bs-target="#oid-content-tab" type="button" role="tab" aria-controls="profile"
+                    aria-selected="false">Search with Offer ID</button>
             </li>
         </ul>
     </div>
-    <div class="d-flex justify-content-center">
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="eid-content-tab" role="tabpanel" aria-labelledby="eid-tab">
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade {{ eid_tab_show }} {{ eid_tab }}" id="eid-content-tab" role="tabpanel"
+            aria-labelledby="eid-tab">
+            <div class="d-flex justify-content-center">
                 <form method="POST">
                     <div class="form-group input-group px-4 pt-2 pb-4">
                         <input name="eid" class="form-control" placeholder="EID (ex. EAC31)" type="input" required>
@@ -90,33 +74,85 @@
                     </div> <!-- form-group// -->
                 </form>
             </div>
-            <div class="tab-pane fade" id="oid-content-tab" role="tabpanel" aria-labelledby="oid-tab">
-                <form method="POST">
-                    <div class="form-group input-group px-4 py-2">
-                        <input name="oid" class="form-control" placeholder="Offer ID (ex. 1630941)" type="input"
-                            required>
-                    </div> <!-- form-group// -->
-                    <div class="form-group input-group px-3 py-3">
-                        <select name="env" class="form-select" aria-label="Default select example" required>
-                            <option value="QA INT">QA INT</option>
-                            <option value="QA1">QA1</option>
-                            <option value="QA2">QA2</option>
-                            <option value="QA3">QA3</option>
-                        </select>
-                    </div> <!-- form-group// -->
-                    <div class="form-group text-center">
-                        <button type="submit" class="btn btn-primary btn-block col-lg-6"
-                            name="oid-submit">Submit</button>
-                    </div> <!-- form-group// -->
-                </form>
+            {% if final_eid_result %}
+            <div class="px-5 py-4">
+                {{ final_eid_result|safe }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="tab-pane fade {{ oid_tab_show }} {{ oid_tab }}" id="oid-content-tab" role="tabpanel"
+            aria-labelledby="oid-tab">
+            <div class="container">
+                <div class="row">
+                    <h4 class="card-title mt-3 text-center">Upload EID Sheet</h4>
+                    <div class="d-flex justify-content-center">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="input-group px-4 py-4">
+                                <input name="eid_file" type="file" class="form-control" required>
+                                <button name="eid-sheet-submit" class="btn btn-outline-primary"
+                                    type="submit">Upload</button>
+                            </div>
+                            <div class="form-group text-center">
+                                {% if eid_file_uploaded %}
+                                <div class="alert alert-primary text-center" role="alert">{{ eid_file_name }} uploaded.</div>
+                                <!-- <small class="text-primary">{{ eid_file_name }} uploaded.</small> -->
+                                {% else %}
+                                {% if eid_error %}
+                                <div class="alert alert-danger text-center" role="alert">{{ eid_error }}</div>
+                                <!-- <small class="text-danger">{{ eid_error }}</small> -->
+                                {% else %}
+                                <div class="alert alert-danger text-center" role="alert">No file uploaded.</div>
+                                <!-- <small class="text-danger">No file uploaded.</small> -->
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="d-flex justify-content-center">
+                        <form method="POST">
+                            <div class="form-group input-group px-4 py-2">
+                                <input name="oid" class="form-control" placeholder="Offer ID (ex. 1630941)" type="input"
+                                    required>
+                            </div> <!-- form-group// -->
+                            <div class="form-group input-group px-3 py-3">
+                                <select name="env" class="form-select" aria-label="Default select example" required>
+                                    <option value="QA INT">QA INT</option>
+                                    <option value="QA 1">QA 1</option>
+                                    <option value="QA 2">QA 2</option>
+                                    <option value="QA 3">QA 3</option>
+                                </select>
+                            </div> <!-- form-group// -->
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary btn-block col-lg-6"
+                                    name="oid-submit">Submit</button>
+                            </div> <!-- form-group// -->
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    {% if final_oid_result %}
+                        {% if display_table %}
+                            <p>Altice</p>
+                            <div class="px-5 py-4">
+                                {{ final_oid_result[0]|safe }}
+                            </div>
+                            <p>Legacy</p>
+                            <div class="px-5 py-4">
+                                {{ final_oid_result[1]|safe }}
+                            </div>
+                        {% else %}
+                        <div class="px-5 py-4">
+                            {{ final_oid_result|safe }}
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-    {% if final %}
-    <div class="d-flex justify-content-center px-5 py-2">
-        {{ final|safe }}
     </div>
-    {% endif %}
     {% endif %}
 
 
