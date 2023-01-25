@@ -244,17 +244,16 @@ def get_corp_ftax_from_offer_id(env: str, offer_id: str) -> None:
     :type offer_id: str
     """
 
-    match env:
-        case "QA INT":
-            corp = ['7702', '7704', '7710', '7715']
-        case "QA 1":
-            corp = ['7708', '7711']
-        case "QA 2":
-            corp = ['7712', '7709']
-        case "QA 3":
-            corp = ['7707', '7714']
-        case _:
-            corp = ['7701', '7703', '7705', '7706', '7713']
+    if env == "QA INT":
+        corp = ['7702', '7704', '7710', '7715']
+    elif env == "QA 1":
+        corp = ['7708', '7711']
+    elif env == "QA 2":
+        corp = ['7712', '7709']
+    elif env == "QA 3":
+        corp = ['7707', '7714']
+    else:
+        corp = ['7701', '7703', '7705', '7706', '7713']
 
     corpftax_altice_list = []
     corpftax_legacy_list = []
