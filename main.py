@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from typing import Union
+import uvicorn
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -299,3 +300,6 @@ def create_output_table(result):
         .replace("<td>", '<td class="text-center">')
     )
     return final_eid_result_df
+
+if __name__ == "__main__":
+    uvicorn.run(app, port=8080, host='0.0.0.0')
