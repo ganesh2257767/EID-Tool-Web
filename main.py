@@ -26,6 +26,8 @@ oid_tab_show = ""
 final_oid_result = None
 final_eid_result = None
 
+btn_status = "secondary", "disabled"
+
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
@@ -42,7 +44,7 @@ async def index(
     env: str = Form(default=None),
 ):
     form = await request.form()
-    global master_file_uploaded, master_file_name, eid_tab, oid_tab, eid_file_name, eid_file_uploaded, final_oid_result, final_eid_result
+    global master_file_uploaded, master_file_name, eid_tab, oid_tab, eid_file_name, eid_file_uploaded, final_oid_result, final_eid_result, btn_status
 
     if "master-submit" in form.keys():
         eid_tab = "active"
@@ -62,6 +64,7 @@ async def index(
                 "oid_tab": oid_tab,
                 "eid_tab_show": eid_tab_show,
                 "oid_tab_show": oid_tab_show,
+                "btn_status": btn_status
             },
         )
     if "eid-sheet-submit" in form.keys():
@@ -85,6 +88,7 @@ async def index(
                 "eid_tab_show": eid_tab_show,
                 "oid_tab_show": oid_tab_show,
                 "final_eid_result": final_eid_result,
+                "btn_status": btn_status
             },
         )
 
@@ -108,6 +112,7 @@ async def index(
                 "final_oid_result": final_oid_result,
                 "eid_file_name": eid_file_name,
                 "eid_file_uploaded": eid_file_uploaded,
+                "btn_status": btn_status
             },
         )
 
@@ -131,7 +136,8 @@ async def index(
                 "eid_file_uploaded": eid_file_uploaded,
                 "final_oid_result": final_oid_result,
                 "final_eid_result": final_eid_result,
-                "display_table": display_table
+                "display_table": display_table,
+                "btn_status": btn_status
             },
         )
 
@@ -153,12 +159,15 @@ def get_master_matrix(master_matrix_path):
         )
     except ImportError as e:
         master_file_uploaded = False
+        master_matrix_dataframe = None
         return e
     except FileNotFoundError:
         master_file_uploaded = False
+        master_matrix_dataframe = None
         return e
     except ValueError as e:
         master_file_uploaded = False
+        master_matrix_dataframe = None
         if (
             "Excel file format cannot be determined, you must specify an engine manually"
             in e.args[0]
@@ -181,7 +190,7 @@ def get_eid_sheet(eid_path) -> None:
     Uploads the EID file supplied and creates a Pandas DataFrame, also throws exceptions if the file format is not excel (.xlsx)
     """
 
-    global eid_file_uploaded, eid_dataframe
+    global eid_file_uploaded, eid_dataframe, btn_status
 
     try:
         eid_dataframe = pd.read_excel(
@@ -191,12 +200,18 @@ def get_eid_sheet(eid_path) -> None:
         )
     except ImportError as e:
         eid_file_uploaded = False
+        btn_status = "secondary", "disabled"
+        eid_dataframe = None
         return e
     except FileNotFoundError:
         eid_file_uploaded = False
+        btn_status = "secondary", "disabled"
+        eid_dataframe = None
         pass
     except ValueError as e:
         eid_file_uploaded = False
+        btn_status = "secondary", "disabled"
+        eid_dataframe = None
         if (
             "Excel file format cannot be determined, you must specify an engine manually"
             in e.args[0]
@@ -209,6 +224,7 @@ def get_eid_sheet(eid_path) -> None:
             return f"Column(s) {error_column_name} not found."
     else:
         eid_file_uploaded = True
+        btn_status = "primary", ""
         return None
 
 
