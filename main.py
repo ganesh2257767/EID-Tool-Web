@@ -301,5 +301,5 @@ def create_output_table(result):
     )
     return final_eid_result_df
 
-if __name__ == "__main__":
-    uvicorn.run(app, port=8080, host='0.0.0.0')
+# if __name__ == "__main__":
+#     uvicorn.run(app, port=8080, host='0.0.0.0')
