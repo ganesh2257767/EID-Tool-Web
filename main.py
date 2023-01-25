@@ -3,6 +3,7 @@ import pandas as pd
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from typing import Union
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -33,8 +34,8 @@ def index(request: Request):
 @app.post("/", response_class=HTMLResponse)
 async def index(
     request: Request,
-    master_file: UploadFile | None = None,
-    eid_file: UploadFile | None = None,
+    master_file: Union[UploadFile, None] = None,
+    eid_file: Union[UploadFile, None] = None,
     eid: str = Form(default=None),
     oid: str = Form(default=None),
     env: str = Form(default=None),
@@ -161,7 +162,7 @@ def get_master_matrix(master_matrix_path):
             "Excel file format cannot be determined, you must specify an engine manually"
             in e.args[0]
         ):
-            return "Please upload an excel file only!"
+            return "Please upload an excel file only."
         elif (
             "Usecols do not match columns, columns expected but not found" in e.args[0]
         ):
@@ -199,7 +200,7 @@ def get_eid_sheet(eid_path) -> None:
             "Excel file format cannot be determined, you must specify an engine manually"
             in e.args[0]
         ):
-            return "Please upload an excel file only!"
+            return "Please upload an excel file only."
         elif (
             "Usecols do not match columns, columns expected but not found" in e.args[0]
         ):
@@ -283,7 +284,7 @@ def get_corp_ftax_from_offer_id(env: str, offer_id: str) -> None:
         smb_result = create_output_table(smb_list)
         return smb_result, False
     else:
-        return f"""<div class="alert alert-primary text-center" role="alert">Offer {offer_id} not present in {env}! Try a different ID.</div>""", False
+        return f"""<div class="alert alert-danger text-center" role="alert">Offer {offer_id} not present in {env}. Try a different ID.</div>""", False
 
 def create_output_table(result):
     final_eid_result = [result[x : x + 6] for x in range(0, len(result) - 1, 6)]
