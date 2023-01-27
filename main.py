@@ -25,8 +25,13 @@ oid_tab_show = ""
 
 final_oid_result = None
 final_eid_result = None
+display_table = None
 
 btn_status = "secondary", "disabled"
+
+class EmptyExcelException(Exception):
+    pass
+
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -44,7 +49,7 @@ async def index(
     env: str = Form(default=None),
 ):
     form = await request.form()
-    global master_file_uploaded, master_file_name, eid_tab, oid_tab, eid_file_name, eid_file_uploaded, final_oid_result, final_eid_result, btn_status
+    global master_file_uploaded, master_file_name, eid_tab, oid_tab, eid_file_name, eid_file_uploaded, final_oid_result, final_eid_result, btn_status, display_table
 
     if "master-submit" in form.keys():
         eid_tab = "active"
@@ -88,7 +93,9 @@ async def index(
                 "eid_tab_show": eid_tab_show,
                 "oid_tab_show": oid_tab_show,
                 "final_eid_result": final_eid_result,
-                "btn_status": btn_status
+                "final_oid_result": final_oid_result,
+                "btn_status": btn_status,
+                "display_table": display_table,
             },
         )
 
@@ -112,7 +119,8 @@ async def index(
                 "final_oid_result": final_oid_result,
                 "eid_file_name": eid_file_name,
                 "eid_file_uploaded": eid_file_uploaded,
-                "btn_status": btn_status
+                "btn_status": btn_status,
+                "display_table": display_table,
             },
         )
 
@@ -157,11 +165,17 @@ def get_master_matrix(master_matrix_path):
             usecols=read_cols,
             converters={"Corp": str, "CONCATENATE": str},
         )
+        if master_matrix_dataframe.empty:
+            raise EmptyExcelException("Empty excel uploaded. Don't try to break me, I'm barely hanging on! :(")
     except ImportError as e:
         master_file_uploaded = False
         master_matrix_dataframe = None
         return e
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        master_file_uploaded = False
+        master_matrix_dataframe = None
+        return e
+    except EmptyExcelException as e:
         master_file_uploaded = False
         master_matrix_dataframe = None
         return e
@@ -198,16 +212,23 @@ def get_eid_sheet(eid_path) -> None:
             usecols=["ELIGIBILITY_ID", "OFFER_ID"],
             converters={"ELIGIBILITY_ID": str, "OFFER_ID": str},
         )
+        if eid_dataframe.empty:
+            raise EmptyExcelException("Empty excel uploaded. Don't try to break me, I'm barely hanging on! :(")
     except ImportError as e:
         eid_file_uploaded = False
         btn_status = "secondary", "disabled"
         eid_dataframe = None
         return e
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         eid_file_uploaded = False
         btn_status = "secondary", "disabled"
         eid_dataframe = None
-        pass
+        return e
+    except EmptyExcelException as e:
+        eid_file_uploaded = False
+        btn_status = "secondary", "disabled"
+        eid_dataframe = None
+        return e
     except ValueError as e:
         eid_file_uploaded = False
         btn_status = "secondary", "disabled"
@@ -316,6 +337,3 @@ def create_output_table(result):
         .replace("<td>", '<td class="text-center">')
     )
     return final_eid_result_df
-
-if __name__ == "__main__":
-    uvicorn.run(app, host='0.0.0.0')
